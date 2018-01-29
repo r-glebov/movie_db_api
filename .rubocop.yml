@@ -1,0 +1,52 @@
+AllCops:
+  Include:
+    - Rakefile
+    - Gemfile
+  Exclude:
+    - config/**/*
+    - spec/**/*
+    - tmp/**/*
+  TargetRubyVersion: 2.3
+
+Rails/TimeZone:
+  Enabled: false
+
+Rails/DynamicFindBy:
+  Enabled: false
+
+Style/PredicateName:
+  Enabled: false
+  NameWhitelist: has_many
+
+Style/Encoding:
+  Enabled: true
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/AbcSize:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Style/Lambda:
+  Enabled: false
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
