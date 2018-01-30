@@ -18,7 +18,7 @@ class AuthenticateUser
   end
 
   def password_valid?
-    user && user.authenticate(params[:password])
+    user&.authenticate(params[:password])
   end
 
   def contents

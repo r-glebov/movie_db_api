@@ -2,7 +2,7 @@ module Api
   module V1
     class AuthsController < ApplicationController
       skip_before_action :authenticate_user
-      
+
       def create
         result = AuthenticateUser.call(params: params)
 
