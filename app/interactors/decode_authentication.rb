@@ -20,9 +20,11 @@ class DecodeAuthentication
   end
 
   def token
-    return authorization_header.split(' ').last if authorization_header.present?
-    context.fail!(type: :token, message: I18n.t('decode_authentication.token_missing'))
-    nil
+    if authorization_header.blank?
+      context.fail!(type: :token, message: I18n.t('decode_authentication.token_missing'))
+    else
+      authorization_header.split(' ').last
+    end
   end
 
   def authorization_header

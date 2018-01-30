@@ -21,10 +21,6 @@ class AuthenticateUser
     user && user.authenticate(params[:password])
   end
 
-  def payload
-
-  end
-
   def contents
     {
       user_id: user.id,
