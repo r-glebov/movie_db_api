@@ -5,7 +5,6 @@ module Api
 
       def create
         result = AuthenticateUser.call(params: params)
-
         if result.success?
           render json: { token: result.token }
         else
