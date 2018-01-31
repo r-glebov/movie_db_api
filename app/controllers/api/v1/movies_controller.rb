@@ -8,7 +8,7 @@ module Api
       end
 
       def create
-        success? Movies::Creator.call(params: movie_params) do |result|
+        success? Movies::Creator.call(params: movie_params.merge(user_id: current_user.id)) do |result|
           render json: result.instance
         end
       end
