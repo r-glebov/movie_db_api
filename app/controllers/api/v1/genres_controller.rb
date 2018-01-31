@@ -1,6 +1,6 @@
 module Api
   module V1
-    class MoviesController < ApplicationController
+    class GenresController < ApplicationController
       include FlowHelper
 
       def index
@@ -8,7 +8,7 @@ module Api
       end
 
       def create
-        success? Movies::Creator.call(params: movie_params) do |result|
+        success? Genres::Creator.call(params: genre_params) do |result|
           render json: result.instance
         end
       end
@@ -18,25 +18,25 @@ module Api
       end
 
       def update
-        success? Movies::Updater.call(id: params[:id], params: movie_params) do |result|
+        success? Genres::Updater.call(id: params[:id], params: genre_params) do |result|
           render json: result.instance
         end
       end
 
       def destroy
-        success? Movies::Destroyer.call(id: params[:id]) do
+        success? Genres::Destroyer.call(id: params[:id]) do
           204
         end
       end
 
       private
 
-      def movie_params
-        params.require(:movie).permit(:title, :description)
+      def genre_params
+        params.require(:genre).permit(:name)
       end
 
       def repository
-        @repository ||= Movies::Repository.new
+        @repository ||= Genres::Repository.new
       end
     end
   end

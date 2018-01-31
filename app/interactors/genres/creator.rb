@@ -1,5 +1,5 @@
-module Movies
+module Genres
   class Creator < BaseCreator
-    model Movie
+    model Genre
   end
 end

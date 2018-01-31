@@ -1,5 +1,5 @@
-module Movies
+module Genres
   class Repository < BaseRepository
-    model Movie
+    model Genre
   end
 end
