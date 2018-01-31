@@ -4,7 +4,7 @@ module Api
       skip_before_action :authenticate_user
 
       def create
-        result = AuthenticateUser.call(params: params)
+        result = AuthenticateUser.call(email: params[:email], password: params[:password])
         if result.success?
           render json: { token: result.token }
         else

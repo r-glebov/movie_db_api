@@ -1,7 +1,7 @@
 class AuthenticateUser
   include Interactor
 
-  delegate :params, to: :context
+  delegate :email, :password, to: :context
 
   def call
     if password_valid?
@@ -14,11 +14,11 @@ class AuthenticateUser
   private
 
   def user
-    @user ||= User.find_by(email: params[:user])
+    @user ||= User.find_by(email: email)
   end
 
   def password_valid?
-    user&.authenticate(params[:password])
+    user&.authenticate(password)
   end
 
   def contents
