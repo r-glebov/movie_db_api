@@ -8,7 +8,7 @@ module Api
       end
 
       def create
-        success? Movies::Creator.call(params: movie_params.merge(user_id: current_user.id)) do |result|
+        success? Movies::Creator.call(params: movie_params.merge(additional_data)) do |result|
           render json: result.instance
         end
       end
@@ -37,6 +37,16 @@ module Api
 
       def repository
         @repository ||= Movies::Repository.new
+      end
+
+      def additional_data
+        {
+          user_id: current_user.id
+        }.merge(genres)
+      end
+
+      def genres
+        params[:genre_ids].present? ? { genre_ids: params[:genre_ids] } : {}
       end
     end
   end

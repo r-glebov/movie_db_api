@@ -2,5 +2,6 @@ class Rating < ApplicationRecord
   belongs_to :movie
   belongs_to :user
 
-  validates :score, numericality: true, greater_than_or_equal_to: 1, lower_than_or_equal_to: 5
+  validates_presence_of :movie
+  validates_inclusion_of :score, in: 0..5
 end
