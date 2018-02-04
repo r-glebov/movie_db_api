@@ -6,6 +6,7 @@ class AuthenticateUser
   def call
     if password_valid?
       context.token = JwtService.encode(contents)
+      context.user = user
     else
       context.fail!(message: I18n.t('authenticate_user.invalid_credentials'))
     end
