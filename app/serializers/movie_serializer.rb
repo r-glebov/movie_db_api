@@ -1,5 +1,5 @@
 class MovieSerializer < ActiveModel::Serializer
-  attributes :id, :title, :description, :user_id, :rating
+  attributes :id, :title, :description, :user_id, :rating, :image_url
   has_many :genres
 
   def genres
