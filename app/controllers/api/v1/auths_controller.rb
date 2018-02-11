@@ -6,7 +6,8 @@ module Api
       def create
         result = AuthenticateUser.call(email: params[:email], password: params[:password])
         if result.success?
-          render json: { token: result.token, user: UserSerializer.new(result.user) }
+          result.user.token = result.token
+          render json: UserSerializer.new(result.user).serialized_json
         else
           render json: { error: result.message }, status: :unauthorized
         end
