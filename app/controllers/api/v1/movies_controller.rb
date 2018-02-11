@@ -1,25 +1,33 @@
 module Api
   module V1
     class MoviesController < ApplicationController
+      skip_before_action :authenticate_user, only: [:index, :show]
+
       include FlowHelper
 
       def index
-        render json: repository.find_all
+        movies = repository.find_all(params.fetch(:filters, {}),
+                                     params.fetch(:pagination, {})) { { es_search: true } }
+        render json: MovieCollectionSerializer.new(movies).serializable_hash
+      end
+
+      def facets
+        render json: repository.facets(params.fetch(:filters, {}))
       end
 
       def create
         success? Movies::Creator.call(params: movie_params.merge(additional_data)) do |result|
-          render json: result.instance
+          render json: serialize(result.instance)
         end
       end
 
       def show
-        render json: repository.find(params[:id])
+        render json: serialize(repository.find(params[:id]), include: [:genres])
       end
 
       def update
         success? Movies::Updater.call(id: params[:id], params: movie_params) do |result|
-          render json: result.instance
+          render json: serialize(result.instance)
         end
       end
 
@@ -47,6 +55,10 @@ module Api
 
       def genres
         params[:genre_ids].present? ? { genre_ids: params[:genre_ids] } : {}
+      end
+
+      def serialize(object, options = {})
+        MovieSerializer.new(object, options).serializable_hash
       end
     end
   end

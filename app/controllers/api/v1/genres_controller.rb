@@ -4,22 +4,22 @@ module Api
       include FlowHelper
 
       def index
-        render json: repository.find_all
+        render json: serialize(repository.find_all)
       end
 
       def create
         success? Genres::Creator.call(params: genre_params) do |result|
-          render json: result.instance
+          render json: serialize(result.instance)
         end
       end
 
       def show
-        render json: repository.find(params[:id])
+        render json: serialize(repository.find(params[:id]))
       end
 
       def update
         success? Genres::Updater.call(id: params[:id], params: genre_params) do |result|
-          render json: result.instance
+          render json: serialize(result.instance)
         end
       end
 
@@ -37,6 +37,10 @@ module Api
 
       def repository
         @repository ||= Genres::Repository.new
+      end
+
+      def serialize(object, options = {})
+        GenreSerializer.new(object, options).serializable_hash
       end
     end
   end

@@ -7,13 +7,23 @@ class BaseRepository
     model.find_by_id(id)
   end
 
-  def find_all
+  def find_all(filters_opts = {}, pagination = {}, &block)
+    return model.es_search(filters_opts.to_h, pagination.to_h) if es_search?(&block)
     model.all
+  end
+
+  def facets(filters_opts = {})
+    model.facet_search(filters_opts.to_h)
   end
 
   private
 
   def model
     self.class.model
+  end
+
+  def es_search?(&_block)
+    option = (yield if block_given?) || {}
+    option.fetch(:es_search, false)
   end
 end
