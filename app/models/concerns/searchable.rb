@@ -7,7 +7,10 @@ module Searchable
 
   included do
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
+
+    after_commit on: [:create]  { __elasticsearch__.index_document }
+    after_commit on: [:update]  { __elasticsearch__.update_document }
+    after_commit on: [:destroy] { __elasticsearch__.delete_document }
 
     setup_mapping
   end
