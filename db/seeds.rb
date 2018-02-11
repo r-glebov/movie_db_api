@@ -23,7 +23,7 @@ class MovieDbService
     37 => 'Western'
   }.freeze
 
-  def initialize(_api_key = Tmdb::Api.key(ENV['TMDB_KEY']))
+  def initialize(_api_key = Tmdb::Api.key(Rails.application.secrets.tmdb_api_key))
     @user = User.first || User.create(email: 'seed@test.com', password: 'seed', admin: true)
     @tmdb = Tmdb::Genre
     @image_path = config.images.base_url + config.images.poster_sizes[4]
