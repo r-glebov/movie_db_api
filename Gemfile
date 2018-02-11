@@ -6,7 +6,9 @@ git_source(:github) do |repo_name|
 end
 
 gem 'bcrypt', '~> 3.1.7'
-gem 'elasticsearch-model'
+gem 'bonsai-elasticsearch-rails'
+gem 'elasticsearch-model', '~> 5.0'
+gem 'elasticsearch-rails', '~> 5.0'
 gem 'fast_jsonapi'
 gem 'interactor', '~> 3.0'
 gem 'jwt'
