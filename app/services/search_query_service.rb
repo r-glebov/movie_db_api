@@ -28,7 +28,7 @@ class SearchQueryService
   end
 
   def prepare_size(facets: false)
-    query.size = facets ? { size: 0 } : { size: MAX_RESULTS }
+    query.size = facets ? { size: MAX_RESULTS } : { size: MAX_RESULTS }
   end
 
   def prepare_pagination(pagination)

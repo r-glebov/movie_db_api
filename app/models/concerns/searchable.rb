@@ -32,20 +32,20 @@ module Searchable
       end
     end
 
-    def es_search(filters_opts, pagination)
-      search_response(es_search_query(filters_opts, pagination)).results
-    end
+    # def es_search(filters_opts, pagination)
+    #   search_response(es_search_query(filters_opts, pagination)).results
+    # end
+    #
+    # def es_search_query(filters_opts, pagination)
+    #   SearchQueryService.call do |builder|
+    #     builder.prepare_query_filter(filters_opts)
+    #     builder.prepare_filters(filter_fields, filters_opts)
+    #     pagination.present? ? builder.prepare_pagination(pagination) : builder.prepare_size
+    #   end
+    # end
 
-    def es_search_query(filters_opts, pagination)
-      SearchQueryService.call do |builder|
-        builder.prepare_query_filter(filters_opts)
-        builder.prepare_filters(filter_fields, filters_opts)
-        pagination.present? ? builder.prepare_pagination(pagination) : builder.prepare_size
-      end
-    end
-
-    def facet_search(filters_opts = {})
-      response = search_response(facet_search_query(filters_opts))
+    def es_search(filters_opts = {}, pagination = {})
+      response = search_response(facet_search_query(filters_opts, pagination))
       facets(response)
     end
 
@@ -53,33 +53,32 @@ module Searchable
       __elasticsearch__.search(query)
     end
 
-    def facet_search_query(filters_opts = {})
+    def facet_search_query(filters_opts = {}, pagination = {})
       SearchQueryService.call do |builder|
         builder.prepare_query_filter(filters_opts)
         builder.prepare_filters(facets_fields, filters_opts)
         builder.prepare_size(facets: true)
         builder.prepare_aggregations
+        pagination.present? ? builder.prepare_pagination(pagination) : builder.prepare_size
       end
     end
 
     def facets(response)
       return {} if response.aggregations.blank?
       result = Hash.new { |k, v| k[v] = {} }
-      response.aggregations.agg_keyword_filter.filter_name.buckets.each do |bucket|
-        bucket.filter_value.buckets.each do |sub_bucket|
-          next unless facets_fields.include?(bucket[:key])
-          sub_bucket_key = sub_bucket[:key].blank? ? NONE_KEY : sub_bucket[:key]
-          result[bucket[:key]][sub_bucket_key] = sub_bucket[:doc_count]
+      %w[keyword integer].each do |type|
+        response.aggregations.send("agg_#{type}_filter").filter_name.buckets.each do |bucket|
+          bucket.filter_value.buckets.each do |sub_bucket|
+            next unless facets_fields.include?(bucket[:key])
+            sub_bucket_key = sub_bucket[:key].blank? ? NONE_KEY : sub_bucket[:key]
+            result[bucket[:key]][sub_bucket_key] = sub_bucket[:doc_count]
+          end
         end
       end
-      response.aggregations.agg_integer_filter.filter_name.buckets.each do |bucket|
-        bucket.filter_value.buckets.each do |sub_bucket|
-          next unless facets_fields.include?(bucket[:key])
-          sub_bucket_key = sub_bucket[:key].blank? ? NONE_KEY : sub_bucket[:key]
-          result[bucket[:key]][sub_bucket_key] = sub_bucket[:doc_count]
-        end
-      end
-      result
+      {
+        facets: result,
+        documents: response.results
+      }
     end
 
     def stats(response)
