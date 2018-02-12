@@ -1,7 +1,7 @@
 module Api
   module V1
     class MoviesController < ApplicationController
-      skip_before_action :authenticate_user, only: [:index, :show]
+      skip_before_action :authenticate_user, only: %i[index show]
 
       include FlowHelper
 

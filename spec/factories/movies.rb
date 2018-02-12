@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :movie do
-    title "MyString"
-    description "MyText"
+    title { Faker::RickAndMorty.unique.quote }
+    description 'Description'
     rating 1
   end
 end
