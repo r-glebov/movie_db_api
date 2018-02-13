@@ -20,6 +20,7 @@ describe 'Movies API', elasticsearch: true do
     it 'returns movies list' do
       output = {
         facets: { rating: { 1 => 1 } },
+        stats: { total_entries: 1 },
         results: MovieCollectionSerializer.new([movie]).serializable_hash
       }.to_json
       expect(response.body).to eq(output)
@@ -34,10 +35,30 @@ describe 'Movies API', elasticsearch: true do
       get '/api/v1/movies?pagination[page]=1&pagination[per_page]=5'
     end
 
-    it 'returns movies list' do
+    it 'returns paginated movies list' do
       output = {
         facets: { rating: { 1 => 10 } },
+        stats: { total_entries: 10, page: 1, per_page: 5 },
         results: MovieCollectionSerializer.new(movies.first(5)).serializable_hash
+      }.to_json
+      expect(response.body).to eq(output)
+    end
+  end
+
+  context 'GET /api/v1/movies?filters[rating]=4' do
+    let!(:movies_with_rating_4) { create_list :movie, 2, :rating_4, user_id: user.id }
+    let!(:movies_with_rating_5) { create_list :movie, 2, :rating_5, user_id: user.id }
+
+    before do
+      sleep 2
+      get '/api/v1/movies?filters[rating]=4'
+    end
+
+    it 'returns filtered movies by rating filter' do
+      output = {
+        facets: { rating: { 4 => 2 } },
+        stats: { total_entries: 2 },
+        results: MovieCollectionSerializer.new(movies_with_rating_4).serializable_hash
       }.to_json
       expect(response.body).to eq(output)
     end
