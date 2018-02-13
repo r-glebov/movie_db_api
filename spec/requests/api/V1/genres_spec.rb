@@ -3,18 +3,11 @@ require 'rails_helper'
 describe 'Genres API' do
   let!(:user) { create :user, id: 1 }
   let(:params) { {} }
-  let(:token_header) do
-    {
-      'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE1MTQ4NTEyMDF9._F7dC0jMOU3R3q7yl9t60ABgQ0PxHqHY2cKPxMIpfUg'
-    }
-  end
+  let(:user_context) { instance_double('Context', result: user) }
 
   before do
-    Timecop.freeze(2018, 1, 1, 0, 0, 1, 1)
-    post '/api/v1/auth', params: { email: user.email, password: 'asdf1234' }
+    allow(DecodeAuthentication).to receive(:call) { user_context }
   end
-
-  after { Timecop.return }
 
   context 'GET /api/v1/genres' do
     let!(:genre) { create :genre }
@@ -42,9 +35,7 @@ describe 'Genres API' do
 
   context 'POST /api/v1/genres' do
     before do
-      post '/api/v1/genres',
-           params: { genre: params.merge(name: 'Genre name') },
-           headers: token_header
+      post '/api/v1/genres', params: { genre: params.merge(name: 'Genre name') }
     end
 
     it 'creates new genre' do
@@ -56,9 +47,7 @@ describe 'Genres API' do
     let!(:genre) { create :genre }
 
     before do
-      put "/api/v1/genres/#{genre.id}",
-          params: { genre: params.merge(name: 'Genre name') },
-          headers: token_header
+      put "/api/v1/genres/#{genre.id}", params: { genre: params.merge(name: 'Genre name') }
     end
 
     it 'updates the genre' do
@@ -71,7 +60,7 @@ describe 'Genres API' do
     let!(:genre) { create :genre }
 
     before do
-      delete "/api/v1/genres/#{genre.id}", headers: token_header
+      delete "/api/v1/genres/#{genre.id}"
     end
 
     it 'deletes the genre' do
