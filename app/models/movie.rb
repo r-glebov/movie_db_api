@@ -21,7 +21,7 @@ class Movie < ApplicationRecord
   end
 
   def average_rating
-    ratings.sum(:score) / ratings.size
+    (ratings.sum(:score) / ratings.size).ceil if ratings.present?
   end
 
   def as_indexed_json(_options = {})
