@@ -8,7 +8,7 @@ class BaseRepository
   end
 
   def find_all(filters_opts = {}, pagination = {}, &block)
-    return model.es_search(filters_opts.to_h, pagination.to_h) if es_search?(&block)
+    return model.es_search(filters_opts, pagination.transform_values(&:to_i)) if es_search?(&block)
     model.all
   end
 

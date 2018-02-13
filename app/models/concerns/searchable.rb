@@ -35,7 +35,7 @@ module Searchable
       {
         facets:    facets(response),
         documents: response.results,
-        stats:     stats(response).merge(pagination.transform_values(&:to_i))
+        stats:     stats(response).merge(pagination)
       }
     end
 

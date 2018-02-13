@@ -29,7 +29,7 @@ class SearchQueryService
   def prepare_pagination(pagination)
     query.pagination = {
       from: START_INDEX.call(pagination),
-      size: pagination[:per_page]
+      size: pagination.fetch(:per_page, DEFAULT_PER_PAGE)
     }
   end
 
@@ -39,8 +39,9 @@ class SearchQueryService
 
   private
 
-  START_INDEX = ->(pagination) { (pagination[:page].to_i - 1) * pagination[:per_page].to_i }
+  START_INDEX = ->(pagination) { (pagination[:page] - 1) * pagination.fetch(:per_page, DEFAULT_PER_PAGE) }
   MAX_RESULTS = 10_000
+  DEFAULT_PER_PAGE = 10
   SLOP_MATCH_PHRASE_LEVEL = 3
   MATCH_ALL_QUERY = {
     match_all: {}
