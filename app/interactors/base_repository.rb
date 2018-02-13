@@ -12,10 +12,6 @@ class BaseRepository
     model.all
   end
 
-  # def facets(filters_opts = {}, pagination = {})
-  #   model.facet_search(filters_opts.to_h, pagination.to_h)
-  # end
-
   private
 
   def model

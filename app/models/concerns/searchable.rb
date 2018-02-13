@@ -1,5 +1,3 @@
-# require 'elasticsearch/model'
-
 module Searchable
   extend ActiveSupport::Concern
 
@@ -32,34 +30,25 @@ module Searchable
       end
     end
 
-    # def es_search(filters_opts, pagination)
-    #   search_response(es_search_query(filters_opts, pagination)).results
-    # end
-    #
-    # def es_search_query(filters_opts, pagination)
-    #   SearchQueryService.call do |builder|
-    #     builder.prepare_query_filter(filters_opts)
-    #     builder.prepare_filters(filter_fields, filters_opts)
-    #     pagination.present? ? builder.prepare_pagination(pagination) : builder.prepare_size
-    #   end
-    # end
-
     def es_search(filters_opts = {}, pagination = {})
-      response = search_response(facet_search_query(filters_opts, pagination))
-      facets(response)
+      response = search_response(search_query(filters_opts, pagination))
+      {
+        facets:    facets(response),
+        documents: response.results,
+        stats:     stats(response).merge(pagination.transform_values(&:to_i))
+      }
     end
 
     def search_response(query)
       __elasticsearch__.search(query)
     end
 
-    def facet_search_query(filters_opts = {}, pagination = {})
+    def search_query(filters_opts = {}, pagination = {})
       SearchQueryService.call do |builder|
         builder.prepare_query_filter(filters_opts)
         builder.prepare_filters(facets_fields, filters_opts)
-        builder.prepare_size(facets: true)
         builder.prepare_aggregations
-        pagination.present? ? builder.prepare_pagination(pagination) : builder.prepare_size
+        builder.prepare_pagination(pagination) if pagination.present?
       end
     end
 
@@ -75,10 +64,7 @@ module Searchable
           end
         end
       end
-      {
-        facets: result,
-        documents: response.results
-      }
+      result
     end
 
     def stats(response)

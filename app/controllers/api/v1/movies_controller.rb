@@ -8,6 +8,7 @@ module Api
       def index
         result = repository.find_all(filters_params, pagination_params) { { es_search: true } }
         render json: { facets: result[:facets],
+                       stats: result[:stats],
                        results: MovieCollectionSerializer.new(result[:documents]).serializable_hash }
       end
 

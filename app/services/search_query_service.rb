@@ -14,7 +14,6 @@ class SearchQueryService
 
   def call
     base_query
-      .merge(query.size)
       .merge(query.pagination)
       .merge(query.aggregations)
   end
@@ -25,10 +24,6 @@ class SearchQueryService
 
   def prepare_filters(filter_fields, filters_opts = {})
     query.filters = filters(filter_fields, filters_opts)
-  end
-
-  def prepare_size(facets: false)
-    query.size = facets ? { size: MAX_RESULTS } : { size: MAX_RESULTS }
   end
 
   def prepare_pagination(pagination)
@@ -106,7 +101,8 @@ class SearchQueryService
           must: query.query_filter,
           filter: query.filters
         }
-      }
+      },
+      size: MAX_RESULTS
     }
   end
 
