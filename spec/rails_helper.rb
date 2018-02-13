@@ -1,8 +1,8 @@
-require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
+require 'spec_helper'
 require 'rspec/rails'
 require 'elasticsearch/extensions/test/cluster'
 
@@ -12,6 +12,17 @@ ENV['TEST_CLUSTER_NODES'] = '1'
 
 RSpec.configure do |config|
   config.include RSpec::Rails::RequestExampleGroup, type: :request, file_path: %r{spec\/api}
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
 
   config.before :all, elasticsearch: true do
     Elasticsearch::Extensions::Test::Cluster.start(port: 9250, nodes: 1, timeout: 120) unless Elasticsearch::Extensions::Test::Cluster.running?(on: 9250)

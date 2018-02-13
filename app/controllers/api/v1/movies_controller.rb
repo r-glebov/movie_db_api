@@ -5,15 +5,8 @@ module Api
 
       include FlowHelper
 
-      # def index
-      #   movies = repository.find_all(params.fetch(:filters, {}),
-      #                                params.fetch(:pagination, {})) { { es_search: true } }
-      #   render json: MovieCollectionSerializer.new(movies).serializable_hash
-      # end
-
       def index
-        result = repository.find_all(params.fetch(:filters, {}),
-                                     params.fetch(:pagination, {})) { { es_search: true } }
+        result = repository.find_all(filters_params, pagination_params) { { es_search: true } }
         render json: { facets: result[:facets],
                        results: MovieCollectionSerializer.new(result[:documents]).serializable_hash }
       end
@@ -44,6 +37,16 @@ module Api
 
       def movie_params
         params.require(:movie).permit(:title, :description)
+      end
+
+      def filters_params
+        return {} if params[:filters].blank?
+        params.require(:filters).permit(:query, :genre, :rating)
+      end
+
+      def pagination_params
+        return {} if params[:pagination].blank?
+        params.require(:pagination).permit(:page, :per_page)
       end
 
       def repository

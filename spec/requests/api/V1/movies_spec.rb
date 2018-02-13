@@ -18,7 +18,11 @@ describe 'Movies API', elasticsearch: true do
     end
 
     it 'returns movies list' do
-      expect(response.body).to eq(MovieCollectionSerializer.new([movie]).serialized_json)
+      output = {
+        facets: { rating: { 1 => 1 } },
+        results: MovieCollectionSerializer.new([movie]).serializable_hash
+      }.to_json
+      expect(response.body).to eq(output)
     end
   end
 
@@ -31,7 +35,11 @@ describe 'Movies API', elasticsearch: true do
     end
 
     it 'returns movies list' do
-      expect(response.body).to eq(MovieCollectionSerializer.new(movies.first(5)).serialized_json)
+      output = {
+        facets: { rating: { 1 => 10 } },
+        results: MovieCollectionSerializer.new(movies.first(5)).serializable_hash
+      }.to_json
+      expect(response.body).to eq(output)
     end
   end
 
