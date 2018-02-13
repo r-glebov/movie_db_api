@@ -3,10 +3,10 @@ require 'rails_helper'
 describe 'Movies API', elasticsearch: true do
   let!(:user) { create :user, id: 1 }
   let(:params) { {} }
-  let(:token_header) do
-    {
-      'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE1MTQ4NTEyMDF9._F7dC0jMOU3R3q7yl9t60ABgQ0PxHqHY2cKPxMIpfUg'
-    }
+  let(:user_context) { instance_double('Context', result: user) }
+
+  before do
+    allow(DecodeAuthentication).to receive(:call) { user_context }
   end
 
   context 'GET /api/v1/movies' do
@@ -18,12 +18,12 @@ describe 'Movies API', elasticsearch: true do
     end
 
     it 'returns movies list' do
-      output = {
+      expected_result = {
         facets: { rating: { 1 => 1 } },
         stats: { total_entries: 1 },
         results: MovieCollectionSerializer.new([movie]).serializable_hash
       }.to_json
-      expect(response.body).to eq(output)
+      expect(response.body).to eq(expected_result)
     end
   end
 
@@ -36,12 +36,12 @@ describe 'Movies API', elasticsearch: true do
     end
 
     it 'returns paginated movies list' do
-      output = {
+      expected_result = {
         facets: { rating: { 1 => 10 } },
         stats: { total_entries: 10, page: 1, per_page: 5 },
         results: MovieCollectionSerializer.new(movies.first(5)).serializable_hash
       }.to_json
-      expect(response.body).to eq(output)
+      expect(response.body).to eq(expected_result)
     end
   end
 
@@ -55,12 +55,12 @@ describe 'Movies API', elasticsearch: true do
     end
 
     it 'returns filtered movies by rating filter' do
-      output = {
+      expected_result = {
         facets: { rating: { 4 => 2 } },
         stats: { total_entries: 2 },
         results: MovieCollectionSerializer.new(movies_with_rating_4).serializable_hash
       }.to_json
-      expect(response.body).to eq(output)
+      expect(response.body).to eq(expected_result)
     end
   end
 
@@ -78,14 +78,9 @@ describe 'Movies API', elasticsearch: true do
 
   context 'POST /api/v1/movies' do
     before do
-      Timecop.freeze(2018, 1, 1, 0, 0, 1, 1)
-      post '/api/v1/auth', params: { email: user.email, password: 'asdf1234' }
-      post '/api/v1/movies',
-           params: { movie: params.merge(title: 'Movie title', user_id: user.id) },
-           headers: token_header
+      allow(DecodeAuthentication).to receive(:call) { user_context }
+      post '/api/v1/movies', params: { movie: params.merge(title: 'Movie title', user_id: user.id) }
     end
-
-    after { Timecop.return }
 
     it 'creates new movie' do
       expect(Movie.count).to eq(1)
@@ -96,14 +91,9 @@ describe 'Movies API', elasticsearch: true do
     let!(:movie) { create :movie, user_id: user.id }
 
     before do
-      Timecop.freeze(2018, 1, 1, 0, 0, 1, 1)
-      post '/api/v1/auth', params: { email: user.email, password: 'asdf1234' }
-      put "/api/v1/movies/#{movie.id}",
-          params: { movie: params.merge(title: 'Movie title', user_id: user.id) },
-          headers: token_header
+      allow(DecodeAuthentication).to receive(:call) { user_context }
+      put "/api/v1/movies/#{movie.id}", params: { movie: params.merge(title: 'Movie title', user_id: user.id) }
     end
-
-    after { Timecop.return }
 
     it 'updates the movie' do
       movie.reload
@@ -115,13 +105,9 @@ describe 'Movies API', elasticsearch: true do
     let!(:movie) { create :movie, user_id: user.id }
 
     before do
-      Timecop.freeze(2018, 1, 1, 0, 0, 1, 1)
-      post '/api/v1/auth',
-           params: { email: user.email, password: 'asdf1234' }
-      delete "/api/v1/movies/#{movie.id}", headers: token_header
+      allow(DecodeAuthentication).to receive(:call) { user_context }
+      delete "/api/v1/movies/#{movie.id}"
     end
-
-    after { Timecop.return }
 
     it 'deletes the movie' do
       expect(response.status).to eq(204)
