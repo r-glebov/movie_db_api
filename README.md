@@ -1,24 +1,49 @@
-# README
+# How to install
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+```text
+git clone git@github.com:r-glebov/movie_db_api.git
+```
 
-Things you may want to cover:
+Install Postgresql and Elasticsearch
 
-* Ruby version
+```text
+brew install postgresql elasticsearch
+```
 
-* System dependencies
+Start Postgresql and Elasticsearch
 
-* Configuration
+```text
+brew services start postgresql
+brew services start elasticsearch
+```
 
-* Database creation
+Run `bundle install`
 
-* Database initialization
+Run db commands: 
 
-* How to run the test suite
+```text
+bundle exec rails db:create
+bundle exec rails db:migrate
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+Seed the database. In order to seed it correctly you need TMDB Api key, which
+can be obtained by the following URL https://www.themoviedb.org
 
-* Deployment instructions
+The you just need to put the key to your `.bash_profile`, `.bashrc`, etc.
 
-* ...
+```text
+echo "export TMDB_KEY="key" >> ~/.bash_profile
+```
+
+```text
+bundle exec rails db:seed
+```
+
+There is a `postman_collection.json` file to play with after importing it to the Postman
+
+
+## Running tests
+
+```text
+rspec spec
+```
