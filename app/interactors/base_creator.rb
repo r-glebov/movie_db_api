@@ -21,20 +21,18 @@ class BaseCreator
   end
 
   def valid?
-    @valid ||= begin
-      Success(instance).bind do |value|
-        if value.valid?
-          Success(value)
-        else
-          Failure(type: :invalid, message: value.errors.messages)
-        end
+    Success(instance).bind do |value|
+      if value.valid?
+        Success(value)
+      else
+        Failure(type: :invalid, message: value.errors.messages)
       end
     end
   end
 
   def saved?
     @saved ||= begin
-      Success(instance).bind do |value|
+      valid?.bind do |value|
         if value.save
           Success(context.instance = instance)
         else
