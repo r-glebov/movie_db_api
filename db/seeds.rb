@@ -30,6 +30,7 @@ class MovieDbService
   end
 
   def call
+    create_user
     create_genres
     create_movies
   end
@@ -37,6 +38,12 @@ class MovieDbService
   private
 
   attr_reader :user, :tmdb, :image_path
+
+  def create_user
+    if User.create(email: 'admin@test.com', password: 'asdf1234')
+      puts "[USER CREATED]"
+    end
+  end
 
   def create_genres
     GENRES_LIST.values.each do |genre_name|
