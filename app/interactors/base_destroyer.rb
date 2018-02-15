@@ -1,26 +1,42 @@
 class BaseDestroyer
   include Interactor
+  include Dry::Monads::Result::Mixin
 
   delegate :id, to: :context
 
   def call
-    if instance.blank?
-      context.fail!(type: :not_found, message: 'Resource with given ID does not exist.')
-    elsif !instance.destroy
-      context.fail!(type: :unprocessable_entity, message: "Entity (#{id}) could not be destroyed.")
-    else
-      context.instance = instance
-    end
+    destroyed?.right? ? destroyed?.value : context.fail!(destroyed?.failure)
   end
+
+  protected
 
   def self.repository(klass = nil)
     @repository ||= klass
   end
 
-  protected
+  private
 
   def instance
-    @instance ||= repository.find(id)
+    @instance ||= begin
+      result = repository.find(id)
+      if result.present?
+        Success(result)
+      else
+        Failure(type: :not_found, message: 'Resource with given ID does not exist.')
+      end
+    end
+  end
+
+  def destroyed?
+    @destroyed ||= begin
+      instance.bind do |value|
+        if value.destroy
+          Success(context.instance = instance.value)
+        else
+          Failure(type: :unprocessable_entity, message: value.errors.messages)
+        end
+      end
+    end
   end
 
   def repository

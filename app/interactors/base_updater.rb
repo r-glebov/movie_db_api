@@ -1,38 +1,42 @@
 class BaseUpdater
   include Interactor
+  include Dry::Monads::Result::Mixin
 
   delegate :id, :params, to: :context
 
   def call
-    if instance.blank?
-      context.fail!(type: :not_found, message: 'Resource with given ID does not exist.')
-    elsif !updated?
-      context.fail!(type: :invalid, message: instance.errors)
-    else
-      context.instance = instance
-    end
+    updated?.right? ? updated?.value : context.fail!(updated?.failure)
   end
+
+  protected
 
   def self.repository(klass = nil)
     @repository ||= klass
   end
 
-  protected
-
-  def valid?
-    instance.valid?
-  end
-
-  def save!
-    instance.save!
-  end
+  private
 
   def instance
-    @instance ||= repository.find(id)
+    @instance ||= begin
+      result = repository.find(id)
+      if result.present?
+        Success(result)
+      else
+        Failure(type: :not_found, message: 'Resource with given ID does not exist.')
+      end
+    end
   end
 
   def updated?
-    instance.update(params)
+    @updated ||= begin
+      instance.bind do |value|
+        if value.update(params)
+          Success(context.instance = instance.value)
+        else
+          Failure(type: :invalid, message: value.errors.messages)
+        end
+      end
+    end
   end
 
   def repository
