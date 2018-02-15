@@ -30,7 +30,7 @@
 							"raw": "{\n  \"action\": \"start\"\n}"
 						},
 						"url": {
-							"raw": "{{host}}/api/v1/movies",
+							"raw": "{{host}}/api/v1/movies?pagination[page]=1&pagination[per_page]=10",
 							"host": [
 								"{{host}}"
 							],
@@ -61,14 +61,12 @@
 								{
 									"key": "pagination[page]",
 									"value": "1",
-									"equals": true,
-									"disabled": true
+									"equals": true
 								},
 								{
 									"key": "pagination[per_page]",
 									"value": "10",
-									"equals": true,
-									"disabled": true
+									"equals": true
 								}
 							]
 						},
@@ -169,7 +167,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Star Wars Episode 34\",\n\t\"description\": \"The Last Jedy\",\n\t\"genre_ids\": [\n\t\t45,46\n\t] \n}"
+							"raw": "{\n  \"title\": \"Star Wars Episode 34\",\n  \"description\": \"The Last Jedy\",\n  \"genre_ids\": [\n    45,46\n  ] \n}"
 						},
 						"url": {
 							"raw": "{{host}}/api/v1/movies",
@@ -202,7 +200,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Star Wars Episode 34\",\n\t\"description\": \"The Last Jedy episode V\",\n\t\"genre_ids\": [45,46]\n}"
+							"raw": "{\n  \"title\": \"Star Wars Episode 34\",\n  \"description\": \"The Last Jedy episode V\",\n  \"genre_ids\": [45,46]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/api/v1/movies/{{id}}",
@@ -447,6 +445,197 @@
 			]
 		},
 		{
+			"name": "Users",
+			"description": "",
+			"item": [
+				{
+					"name": "Users collection",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"action\": \"start\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "[Create] User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "85e98b27-a537-41af-a341-5cd99e21ab04",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"user_id\", jsonData.data.id);",
+									"",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user\": {\n\t\t\"email\": \"user_test_12@test.com\",\n\t\t\"password\": \"asdf1234\",\n\t\t\"password_confirmation\": \"asdf1234\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "[Show] User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Star Wars Episode 10\",\n  \"description\": \"The Last Jedy\",\n  \"genre_ids\": [2,3]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "[Update] User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user\": {\n\t\t\"email\": \"user_test_8@test.com\",\n\t\t\"password\": \"asdf1234\",\n\t\t\"password_confirmation\": \"asdf1234\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "[Delete] User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/10",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"10"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Rating",
 			"description": "",
 			"item": [
@@ -466,7 +655,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"score\": 3\n}"
+							"raw": "{\n  \"score\": 5\n}"
 						},
 						"url": {
 							"raw": "{{host}}/api/v1/ratings/{{movie_id}}",
@@ -513,7 +702,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"asdf1234\"\n}"
+					"raw": "{\n  \"email\": \"user_test_1@test.com\",\n  \"password\": \"asdf123456\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/api/v1/auth",
