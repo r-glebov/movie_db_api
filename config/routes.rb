@@ -5,6 +5,7 @@ Rails.application.routes.draw do
         get 'facets', on: :collection
       end
       resources :genres
+      resources :users
       resources :ratings, only: :update
       resource :auth, only: %i[create]
     end
