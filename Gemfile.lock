@@ -58,8 +58,9 @@ GEM
     dry-core (0.4.4)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.2.0)
-    dry-monads (0.4.0)
-      dry-core (~> 0.3, >= 0.3.3)
+    dry-monads (1.0.0.beta1)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
     elasticsearch (5.0.4)
       elasticsearch-api (= 5.0.4)
@@ -242,7 +243,7 @@ DEPENDENCIES
   bcrypt (~> 3.1.7)
   bonsai-elasticsearch-rails
   database_cleaner
-  dry-monads
+  dry-monads (= 1.0.0.beta1)
   elasticsearch-extensions
   elasticsearch-model (~> 5.0)
   elasticsearch-rails (~> 5.0)

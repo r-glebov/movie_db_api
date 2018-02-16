@@ -1,11 +1,12 @@
 class BaseUpdater
   include Interactor
-  include Dry::Monads::Result::Mixin
+  include Dry::Monads
+  include Dry::Monads::Do.for(:call)
 
   delegate :id, :params, to: :context
 
   def call
-    updated?.right? ? updated?.value : context.fail!(updated?.failure)
+    yield update(yield record)
   end
 
   protected
@@ -16,30 +17,24 @@ class BaseUpdater
 
   private
 
-  def instance
-    @instance ||= begin
-      result = repository.find(id)
-      if result.present?
-        Success(result)
-      else
-        Failure(type: :not_found, message: 'Resource with given ID does not exist.')
-      end
+  def record
+    record = repository.find(id)
+    if record.present?
+      Success(record)
+    else
+      Failure(context.fail!(type: :not_found, message: 'Resource with given ID does not exist.'))
     end
   end
 
-  def updated?
-    @updated ||= begin
-      instance.bind do |value|
-        if value.update(params)
-          Success(context.instance = instance.value)
-        else
-          Failure(type: :invalid, message: value.errors.messages)
-        end
-      end
+  def update(record)
+    if record.update(params)
+      Success(context.instance = record)
+    else
+      Failure(context.fail!(type: :invalid, message: record.errors.messages))
     end
   end
 
   def repository
-    @repository ||= self.class.repository.new
+    self.class.repository.new
   end
 end
