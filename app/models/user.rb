@@ -5,6 +5,5 @@ class User < ApplicationRecord
   attr_accessor :token
 
   validates :email, presence: true, uniqueness: true
-  validates :password, :password_confirmation, presence: true, on: [:create, :update]
-  validates :password, confirmation: true, on: [:create, :update]
+  validates :password_confirmation, presence: true
 end
