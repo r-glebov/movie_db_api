@@ -3,10 +3,11 @@ module Api
     class MoviesController < ApplicationController
       skip_before_action :authenticate_user, only: %i[index show]
 
+      include Import['movies_repository']
       include FlowHelper
 
       def index
-        result = repository.find_all(filters_params, pagination_params) { { es_search: true } }
+        result = movies_repository.find_all(filters_params, pagination_params) { { es_search: true } }
         render json: { facets: result[:facets],
                        stats: result[:stats],
                        results: MovieCollectionSerializer.new(result[:documents]).serializable_hash }
@@ -19,7 +20,7 @@ module Api
       end
 
       def show
-        render json: serialize(repository.find(params[:id]), include: [:genres])
+        render json: serialize(movies_repository.find(params[:id]), include: [:genres])
       end
 
       def update
@@ -48,10 +49,6 @@ module Api
       def pagination_params
         return {} if params[:pagination].blank?
         params.require(:pagination).permit(:page, :per_page)
-      end
-
-      def repository
-        @repository ||= Movies::Repository.new
       end
 
       def additional_data

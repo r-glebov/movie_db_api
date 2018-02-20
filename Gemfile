@@ -6,6 +6,7 @@ git_source(:github) do |repo_name|
 end
 
 gem 'bcrypt', '~> 3.1.7'
+gem 'dry-auto_inject'
 gem 'dry-monads', '1.0.0.beta1'
 gem 'elasticsearch-model', '~> 5.0'
 gem 'elasticsearch-rails', '~> 5.0'

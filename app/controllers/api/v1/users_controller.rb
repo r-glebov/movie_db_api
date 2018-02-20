@@ -3,10 +3,11 @@ module Api
     class UsersController < ApplicationController
       skip_before_action :authenticate_user, only: %i[create]
 
+      include Import['users_repository']
       include FlowHelper
 
       def index
-        render json: serialize(repository.find_all)
+        render json: serialize(users_repository.find_all)
       end
 
       def create
@@ -16,7 +17,7 @@ module Api
       end
 
       def show
-        render json: serialize(repository.find(params[:id]))
+        render json: serialize(users_repository.find(params[:id]))
       end
 
       def update
@@ -35,10 +36,6 @@ module Api
 
       def user_params
         params.require(:user).permit(:email, :password, :password_confirmation)
-      end
-
-      def repository
-        @repository ||= Users::Repository.new
       end
 
       def serialize(object, options = {})

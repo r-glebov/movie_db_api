@@ -3,10 +3,11 @@ module Api
     class GenresController < ApplicationController
       skip_before_action :authenticate_user, only: %i[index show]
 
+      include Import['genres_repository']
       include FlowHelper
 
       def index
-        render json: serialize(repository.find_all)
+        render json: serialize(genres_repository.find_all)
       end
 
       def create
@@ -16,7 +17,7 @@ module Api
       end
 
       def show
-        render json: serialize(repository.find(params[:id]))
+        render json: serialize(genres_repository.find(params[:id]))
       end
 
       def update
@@ -35,10 +36,6 @@ module Api
 
       def genre_params
         params.require(:genre).permit(:name)
-      end
-
-      def repository
-        @repository ||= Genres::Repository.new
       end
 
       def serialize(object, options = {})

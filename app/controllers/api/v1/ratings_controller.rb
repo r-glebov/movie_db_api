@@ -1,6 +1,8 @@
 module Api
   module V1
     class RatingsController < ApplicationController
+
+      include Import['ratings_repository', 'movies_repository']
       include FlowHelper
 
       def update
@@ -17,16 +19,12 @@ module Api
 
       def rating
         @rating ||= begin
-          repository.find_by_movie(additional_data) || movie.ratings.create(user_id: current_user.id)
+          ratings_repository.find_by_movie(additional_data) || movie.ratings.create(user_id: current_user.id)
         end
       end
 
-      def repository
-        @repository ||= Ratings::Repository.new
-      end
-
       def movie
-        @movie ||= Movies::Repository.new.find(params[:id])
+        @movie ||= movies_repository.find(params[:id])
       end
 
       def additional_data
