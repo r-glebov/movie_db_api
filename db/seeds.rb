@@ -40,8 +40,16 @@ class MovieDbService
   attr_reader :user, :tmdb, :image_path
 
   def create_user
-    if User.create(email: 'admin@test.com', password: 'asdf1234')
-      puts "[USER CREATED]"
+    params = {
+      email: 'admin@test.com',
+      password: 'asdf1234',
+      password_confirmation: 'asdf1234'
+    }
+    result = Users::Creator.call(params: params)
+    if result.success?
+      puts '[USER ADDED]'
+    else
+      puts "[USER ERROR]: #{result.message}"
     end
   end
 
@@ -51,7 +59,7 @@ class MovieDbService
       if result.success?
         puts "[GENRE ADDED]: #{result.instance.name}"
       else
-        puts "[GENRE ERROR]: #{result.message.messages}"
+        puts "[GENRE ERROR]: #{result.message}"
       end
     end
   end
@@ -62,7 +70,7 @@ class MovieDbService
       if result.success?
         puts "[MOVIE ADDED]: #{result.instance.title}"
       else
-        puts "[MOVIE ERROR]: #{result.message.messages}"
+        puts "[MOVIE ERROR]: #{result.message}"
       end
     end
   end

@@ -1,5 +1,6 @@
 unless Rails.env.test?
   Movie.__elasticsearch__.create_index!(force: true) unless Movie.__elasticsearch__.index_exists?
+  Movie.import(force: true)
 end
 
 Elasticsearch::Model.client = Elasticsearch::Client.new(
